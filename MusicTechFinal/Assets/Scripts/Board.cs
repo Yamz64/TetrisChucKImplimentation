@@ -206,6 +206,8 @@ public class Board : MonoBehaviour
         //first check to see if there are any rows of blocks
         bool found_row = true;
         int multiplier = 0;
+        List<long> instruments = new List<long>();
+        List<long> midi_scores = new List<long>();
         while (found_row == true)
         {
             found_row = false;
@@ -240,13 +242,17 @@ public class Board : MonoBehaviour
             if (found_row)
             {
                 multiplier++;
+                int instrument = 19 - row_y_pos;
+                int midi_score = 0;
                 for (int x = 0; x < board_data.GetLength(1); x++)
                 {
+                    midi_score += board_data[row_y_pos, x];
                     board_data[row_y_pos, x] = 0;
                     Vector2Int tile = Array2Tile(new Vector2Int(x, row_y_pos));
                     board.SetTile((Vector3Int)tile, null);
                 }
-                
+                midi_scores.Add(midi_score);
+                instruments.Add(instrument);
                 for (int y = row_y_pos - 1; y > -1; y--)
                 {
                     for (int x = 0; x < board_data.GetLength(1); x++)
@@ -263,6 +269,17 @@ public class Board : MonoBehaviour
         }
         score += 100 * multiplier;
         score_text.text = score.ToString();
+
+        //handle sound info
+        long[] instrument_data = new long[instruments.Count];
+        long[] midi_data = new long[midi_scores.Count];
+
+        for(int i=0; i<instrument_data.GetLength(0); i++)
+        {
+            instrument_data[i] = instruments[i];
+            midi_data[i] = midi_scores[i];
+        }
+        if(instrument_data.GetLength(0) > 0 && midi_data.GetLength(0) > 0) chuck.PlayAudio(instrument_data, midi_data);
     }
 
     void UpdateData()
@@ -456,6 +473,7 @@ public class Board : MonoBehaviour
     public Vector2Int block_position;
     public Text score_text;
     public Text level_text;
+    public ChuckAudioHandler chuck;
 
     [SerializeField]
     public List<Tile> tetrimino_tiles;

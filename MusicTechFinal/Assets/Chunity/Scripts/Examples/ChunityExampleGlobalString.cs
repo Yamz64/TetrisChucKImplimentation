@@ -9,6 +9,7 @@ public class ChunityExampleGlobalString : MonoBehaviour
 
 	private ChuckSubInstance myChuck;
 	private ChuckStringSyncer mySyncer;
+    private Chuck.StringCallback strcallback;
 
 	private bool haveSetOnce = false;
 
